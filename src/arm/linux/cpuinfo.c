@@ -679,6 +679,7 @@ static bool parse_line(
 	if (line_start == line_end) {
 		return true;
 	}
+	(void)line_number;
 
 	/* Search for ':' on the line. */
 	const char* separator = line_start;
