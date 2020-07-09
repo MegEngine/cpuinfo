@@ -2402,6 +2402,7 @@ struct cpuinfo_arm_chipset cpuinfo_arm_linux_decode_chipset_from_proc_cpuinfo_ha
 
 		#endif
 
+		(void)max_cpu_freq_max;
 		/* Check Telechips TCC signature */
 		if (match_tcc(hardware, hardware_end, &chipset)) {
 			cpuinfo_log_debug(

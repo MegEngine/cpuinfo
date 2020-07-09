@@ -217,6 +217,7 @@ bool cpuinfo_linux_get_processor_package_id(uint32_t processor, uint32_t package
 
 static bool max_processor_number_parser(uint32_t processor_list_start, uint32_t processor_list_end, void* context) {
 	uint32_t* processor_number_ptr = (uint32_t*) context;
+	(void)processor_list_start;
 	const uint32_t processor_list_last = processor_list_end - 1;
 	if (*processor_number_ptr < processor_list_last) {
 		*processor_number_ptr = processor_list_last;
