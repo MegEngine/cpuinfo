@@ -101,38 +101,16 @@ static int cmp_arm_linux_processor(const void* ptr_a, const void* ptr_b) {
 	return cmp(id_a, id_b);
 }
 
-static struct cpuinfo_arm_linux_processor* arm_linux_processors = NULL;
-static struct cpuinfo_processor* processors = NULL;
-static struct cpuinfo_core* cores = NULL;
-static struct cpuinfo_cluster* clusters = NULL;
-static struct cpuinfo_uarch_info* uarchs = NULL;
-static struct cpuinfo_cache* l1i = NULL;
-static struct cpuinfo_cache* l1d = NULL;
-static struct cpuinfo_cache* l2 = NULL;
-static struct cpuinfo_cache* l3 = NULL;
-
-void atexit_free(void) {
-#define CA(ptr)             \
-	if (ptr) {          \
-		free(ptr);  \
-		ptr = NULL; \
-	}
-	CA(arm_linux_processors);
-	CA(processors);
-	CA(cores);
-	CA(clusters);
-	CA(uarchs);
-	CA(l1i);
-	CA(l1d);
-	CA(l2);
-	CA(l3);
-	CA(cpuinfo_linux_cpu_to_processor_map);
-	CA(cpuinfo_linux_cpu_to_core_map);
-	CA(cpuinfo_linux_cpu_to_uarch_index_map);
-#undef CA
-}
-
 void cpuinfo_arm_linux_init(void) {
+	struct cpuinfo_arm_linux_processor* arm_linux_processors = NULL;
+	struct cpuinfo_processor* processors = NULL;
+	struct cpuinfo_core* cores = NULL;
+	struct cpuinfo_cluster* clusters = NULL;
+	struct cpuinfo_uarch_info* uarchs = NULL;
+	struct cpuinfo_cache* l1i = NULL;
+	struct cpuinfo_cache* l1d = NULL;
+	struct cpuinfo_cache* l2 = NULL;
+	struct cpuinfo_cache* l3 = NULL;
 	const struct cpuinfo_processor** linux_cpu_to_processor_map = NULL;
 	const struct cpuinfo_core** linux_cpu_to_core_map = NULL;
 	uint32_t* linux_cpu_to_uarch_index_map = NULL;
@@ -256,8 +234,6 @@ void cpuinfo_arm_linux_init(void) {
 		cpuinfo_arm_linux_decode_chipset(proc_cpuinfo_hardware, proc_cpuinfo_revision, valid_processors, 0);
 #endif
 
-#if !defined(__UCLIBC__)
-
 	#if CPUINFO_ARCH_ARM
 		uint32_t isa_features = 0, isa_features2 = 0;
 		#ifdef __ANDROID__
@@ -306,7 +282,7 @@ void cpuinfo_arm_linux_init(void) {
 		cpuinfo_arm64_linux_decode_isa_from_proc_cpuinfo(
 			isa_features, last_midr, &chipset, &cpuinfo_isa);
 	#endif
-#endif
+
 	/* Detect min/max frequency and package ID */
 	for (uint32_t i = 0; i < arm_linux_processors_count; i++) {
 		if (bitmask_all(arm_linux_processors[i].flags, CPUINFO_LINUX_FLAG_VALID)) {
@@ -763,6 +739,26 @@ void cpuinfo_arm_linux_init(void) {
 
 	cpuinfo_is_initialized = true;
 
+	processors = NULL;
+	cores = NULL;
+	clusters = NULL;
+	uarchs = NULL;
+	l1i = l1d = l2 = l3 = NULL;
+	linux_cpu_to_processor_map = NULL;
+	linux_cpu_to_core_map = NULL;
+	linux_cpu_to_uarch_index_map = NULL;
+
 cleanup:
-	atexit(atexit_free);
+	free(arm_linux_processors);
+	free(processors);
+	free(cores);
+	free(clusters);
+	free(uarchs);
+	free(l1i);
+	free(l1d);
+	free(l2);
+	free(l3);
+	free(linux_cpu_to_processor_map);
+	free(linux_cpu_to_core_map);
+	free(linux_cpu_to_uarch_index_map);
 }

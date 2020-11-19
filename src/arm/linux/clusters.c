@@ -95,7 +95,7 @@ bool cpuinfo_arm_linux_detect_core_clusters_by_heuristic(
 
 	uint32_t cluster = 0;
 	uint32_t expected_cluster_processors = 0;
-	uint32_t cluster_start, cluster_flags = 0, cluster_midr = 0, cluster_max_frequency = 0, cluster_min_frequency;
+	uint32_t cluster_start, cluster_flags, cluster_midr, cluster_max_frequency, cluster_min_frequency;
 	bool expected_cluster_exists;
 	for (uint32_t i = 0; i < max_processors; i++) {
 		if (bitmask_all(processors[i].flags, CPUINFO_LINUX_FLAG_VALID)) {
@@ -320,7 +320,7 @@ void cpuinfo_arm_linux_detect_core_clusters_by_sequential_scan(
 {
 	uint32_t cluster_flags = 0;
 	uint32_t cluster_processors = 0;
-	uint32_t cluster_start = 0, cluster_midr = 0, cluster_max_frequency = 0, cluster_min_frequency;
+	uint32_t cluster_start, cluster_midr, cluster_max_frequency, cluster_min_frequency;
 	for (uint32_t i = 0; i < max_processors; i++) {
 		if ((processors[i].flags & (CPUINFO_LINUX_FLAG_VALID | CPUINFO_LINUX_FLAG_PACKAGE_CLUSTER)) == CPUINFO_LINUX_FLAG_VALID) {
 			if (cluster_processors == 0) {
