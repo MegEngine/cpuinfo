@@ -15,7 +15,8 @@
 #include <arm/linux/api.h>
 #include <cpuinfo/log.h>
 
-#if CPUINFO_ARCH_ARM64 || CPUINFO_ARCH_ARM && !defined(__ANDROID__)
+#if CPUINFO_ARCH_ARM64 || CPUINFO_ARCH_ARM && !defined(__ANDROID__) && !defined(__UCLIBC__)
+
 	#include <sys/auxv.h>
 #else
 	#define AT_HWCAP 16
@@ -36,7 +37,7 @@
 #endif
 
 
-#if CPUINFO_ARCH_ARM
+#if CPUINFO_ARCH_ARM && !defined(__UCLIBC__)
 	typedef unsigned long (*getauxval_function_t)(unsigned long);
 
 	bool cpuinfo_arm_linux_hwcap_from_getauxval(
@@ -142,7 +143,7 @@
 			#endif
 		}
 	#endif /* __ANDROID__ */
-#elif CPUINFO_ARCH_ARM64
+#elif CPUINFO_ARCH_ARM64 && !defined(__UCLIBC__)
 	void cpuinfo_arm_linux_hwcap_from_getauxval(
 		uint32_t hwcap[restrict static 1],
 		uint32_t hwcap2[restrict static 1])
