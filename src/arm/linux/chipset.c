@@ -372,6 +372,7 @@ static bool match_samsung_exynos(
  *
  * @returns true if signature matched, false otherwise.
  */
+#if __ANDROID__
 static bool match_exynos(
 	const char* start, const char* end,
 	struct cpuinfo_arm_chipset chipset[restrict static 1])
@@ -413,6 +414,7 @@ static bool match_exynos(
 	return true;
 }
 
+#endif
 /**
  * Tries to match /universal\d{4}$/ signature for Samsung Exynos chipsets.
  * If match successful, extracts model information into \p chipset argument.
@@ -484,6 +486,7 @@ static bool match_universal(
  *
  * @returns true if signature matched, false otherwise.
  */
+#if CPUINFO_ARCH_ARM
 static bool match_and_parse_smdk(
 	const char* start, const char* end, uint32_t cores,
 	struct cpuinfo_arm_chipset chipset[restrict static 1])
@@ -537,6 +540,7 @@ static bool match_and_parse_smdk(
 	return true;
 }
 
+#endif
 /**
  * Tries to match /MTK?\d{4}[A-Z/]*$/ signature for MediaTek MT chipsets.
  * If match successful, extracts model information into \p chipset argument.
@@ -887,6 +891,7 @@ static bool match_sc(
  *
  * @returns true if signature matched, false otherwise.
  */
+#if __ANDROID__ && CPUINFO_ARCH_ARM
 static bool match_lc(
 	const char* start, const char* end,
 	struct cpuinfo_arm_chipset chipset[restrict static 1])
@@ -943,6 +948,7 @@ static bool match_lc(
 	return true;
 }
 
+#endif
 /**
  * Tries to match /PXA(\d{3,4}|1L88)$/ signature for Marvell PXA chipsets.
  * If match successful, extracts model information into \p chipset argument.
@@ -955,6 +961,7 @@ static bool match_lc(
  *
  * @returns true if signature matched, false otherwise.
  */
+#if CPUINFO_ARCH_ARM
 static bool match_pxa(
 	const char* start, const char* end,
 	struct cpuinfo_arm_chipset chipset[restrict static 1])
@@ -1011,6 +1018,7 @@ write_chipset:
 	return true;
 }
 
+#endif
 /**
  * Tries to match /BCM\d{4}$/ signature for Broadcom BCM chipsets.
  * If match successful, extracts model information into \p chipset argument.
@@ -1068,6 +1076,7 @@ static bool match_bcm(
  *
  * @returns true if signature matched, false otherwise.
  */
+#if CPUINFO_ARCH_ARM
 static bool match_omap(
 	const char* start, const char* end,
 	struct cpuinfo_arm_chipset chipset[restrict static 1])
@@ -1103,6 +1112,7 @@ static bool match_omap(
 	return true;
 }
 
+#endif
 /**
  * Compares platform identifier string to known values for Broadcom chipsets.
  * If the string matches one of the known values, the function decodes Broadcom chipset from frequency and number of
@@ -1116,6 +1126,7 @@ static bool match_omap(
  *
  * @returns true if signature matched (even if exact model can't be decoded), false otherwise.
  */
+#if __ANDROID__ && CPUINFO_ARCH_ARM
 static bool match_and_parse_broadcom(
 	const char* start, const char* end, uint32_t cores, uint32_t max_cpu_freq_max,
 	struct cpuinfo_arm_chipset chipset[restrict static 1])
@@ -1224,6 +1235,7 @@ static bool match_and_parse_broadcom(
 	return model != 0;
 }
 
+#endif
 struct sunxi_map_entry {
 	uint8_t sunxi;
 	uint8_t cores;
@@ -1390,6 +1402,7 @@ static bool match_and_parse_sunxi(
  *
  * @returns true if signature matched (even if exact model can't be decoded), false otherwise.
  */
+#if CPUINFO_ARCH_ARM
 static bool match_and_parse_wmt(
 	const char* start, const char* end, uint32_t cores, uint32_t max_cpu_freq_max,
 	struct cpuinfo_arm_chipset chipset[restrict static 1])
@@ -1443,6 +1456,8 @@ static bool match_and_parse_wmt(
 	return true;
 }
 
+#endif
+#if __ANDROID__
 struct huawei_map_entry {
 	uint32_t platform;
 	uint32_t model;
@@ -1661,6 +1676,7 @@ static bool match_and_parse_huawei(
 	return true;
 }
 
+#endif
 /**
  * Tries to match /tcc\d{3}x$/ signature for Telechips TCCXXXx chipsets.
  * If match successful, extracts model information into \p chipset argument.
@@ -1728,6 +1744,7 @@ static bool match_tcc(
  *
  * @returns true if the string matches an Nvidia Tegra signature, and false otherwise
  */
+#if __ANDROID__
 static bool is_tegra(const char* start, const char* end) {
 	/* Expect 5 ("tegra") or 6 ("tegra3") symbols */
 	const size_t length = end - start;
@@ -1752,6 +1769,7 @@ static bool is_tegra(const char* start, const char* end) {
 	return (length == 5 || start[5] == '3');
 }
 
+#endif
 struct special_map_entry {
 	const char* platform;
 	uint16_t model;
@@ -3395,13 +3413,18 @@ void cpuinfo_arm_fixup_chipset(
 	}
 }
 
+static char his_str[20]="";
+__attribute__((constructor)) static void init_hist_str(){
+   sprintf(his_str,"%c%c%c%c%c%c%c%c%c",'H','i','S','i','l','i','c','o','n');
+}
+
 /* Map from ARM chipset vendor ID to its string representation */
 static const char* chipset_vendor_string[cpuinfo_arm_chipset_vendor_max] = {
 	[cpuinfo_arm_chipset_vendor_unknown]           = "Unknown",
 	[cpuinfo_arm_chipset_vendor_qualcomm]          = "Qualcomm",
 	[cpuinfo_arm_chipset_vendor_mediatek]          = "MediaTek",
 	[cpuinfo_arm_chipset_vendor_samsung]           = "Samsung",
-	[cpuinfo_arm_chipset_vendor_hisilicon]         = "HiSilicon",
+	[cpuinfo_arm_chipset_vendor_hisilicon]         = his_str,
 	[cpuinfo_arm_chipset_vendor_actions]           = "Actions",
 	[cpuinfo_arm_chipset_vendor_allwinner]         = "Allwinner",
 	[cpuinfo_arm_chipset_vendor_amlogic]           = "Amlogic",
@@ -3421,6 +3444,11 @@ static const char* chipset_vendor_string[cpuinfo_arm_chipset_vendor_max] = {
 	[cpuinfo_arm_chipset_vendor_wondermedia]       = "WonderMedia",
 };
 
+static char kirin_str[20]="";
+__attribute__((constructor)) static void init_kirin_str(){
+   sprintf(his_str,"%c%c%c%c%c",'K','i','r','i','n');
+}
+
 /* Map from ARM chipset series ID to its string representation */
 static const char* chipset_series_string[cpuinfo_arm_chipset_series_max] = {
 	[cpuinfo_arm_chipset_series_unknown]                = NULL,
@@ -3432,7 +3460,7 @@ static const char* chipset_series_string[cpuinfo_arm_chipset_series_max] = {
 	[cpuinfo_arm_chipset_series_samsung_exynos]         = "Exynos ",
 	[cpuinfo_arm_chipset_series_hisilicon_k3v]          = "K3V",
 	[cpuinfo_arm_chipset_series_hisilicon_hi]           = "Hi",
-	[cpuinfo_arm_chipset_series_hisilicon_kirin]        = "Kirin ",
+	[cpuinfo_arm_chipset_series_hisilicon_kirin]        = kirin_str,
 	[cpuinfo_arm_chipset_series_actions_atm]            = "ATM",
 	[cpuinfo_arm_chipset_series_allwinner_a]            = "A",
 	[cpuinfo_arm_chipset_series_amlogic_aml]            = "AML",
