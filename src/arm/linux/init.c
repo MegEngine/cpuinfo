@@ -742,26 +742,27 @@ void cpuinfo_arm_linux_init(void) {
 
 	cpuinfo_is_initialized = true;
 
-	processors = NULL;
-	cores = NULL;
-	clusters = NULL;
-	uarchs = NULL;
-	l1i = l1d = l2 = l3 = NULL;
-	linux_cpu_to_processor_map = NULL;
-	linux_cpu_to_core_map = NULL;
-	linux_cpu_to_uarch_index_map = NULL;
-
 cleanup:
-	free(arm_linux_processors);
-	free(processors);
-	free(cores);
-	free(clusters);
-	free(uarchs);
-	free(l1i);
-	free(l1d);
-	free(l2);
-	free(l3);
-	free(linux_cpu_to_processor_map);
-	free(linux_cpu_to_core_map);
-	free(linux_cpu_to_uarch_index_map);
+
+#define CB(ptr) 	\
+	if (ptr) {		\
+		free(ptr);	\
+		ptr = NULL;	\
+	}
+
+	CB(arm_linux_processors);
+	CB(processors);
+	CB(cores);
+	CB(clusters);
+	CB(uarchs);
+	CB(l1i);
+	CB(l1d);
+	CB(l2);
+	CB(l3);
+	CB(linux_cpu_to_processor_map);
+	CB(linux_cpu_to_core_map);
+	CB(linux_cpu_to_uarch_index_map);
+
+#undef CB
+
 }
