@@ -101,16 +101,38 @@ static int cmp_arm_linux_processor(const void* ptr_a, const void* ptr_b) {
 	return cmp(id_a, id_b);
 }
 
+static struct cpuinfo_arm_linux_processor* arm_linux_processors = NULL;
+static struct cpuinfo_processor* processors = NULL;
+static struct cpuinfo_core* cores = NULL;
+static struct cpuinfo_cluster* clusters = NULL;
+static struct cpuinfo_uarch_info* uarchs = NULL;
+static struct cpuinfo_cache* l1i = NULL;
+static struct cpuinfo_cache* l1d = NULL;
+static struct cpuinfo_cache* l2 = NULL;
+static struct cpuinfo_cache* l3 = NULL;
+
+void atexit_free(void) {
+#define CA(ptr)             \
+	if (ptr) {          \
+		free(ptr);  \
+		ptr = NULL; \
+	}
+	CA(arm_linux_processors);
+	CA(processors);
+	CA(cores);
+	CA(clusters);
+	CA(uarchs);
+	CA(l1i);
+	CA(l1d);
+	CA(l2);
+	CA(l3);
+	CA(cpuinfo_linux_cpu_to_processor_map);
+	CA(cpuinfo_linux_cpu_to_core_map);
+	CA(cpuinfo_linux_cpu_to_uarch_index_map);
+#undef CA
+}
+
 void cpuinfo_arm_linux_init(void) {
-	struct cpuinfo_arm_linux_processor* arm_linux_processors = NULL;
-	struct cpuinfo_processor* processors = NULL;
-	struct cpuinfo_core* cores = NULL;
-	struct cpuinfo_cluster* clusters = NULL;
-	struct cpuinfo_uarch_info* uarchs = NULL;
-	struct cpuinfo_cache* l1i = NULL;
-	struct cpuinfo_cache* l1d = NULL;
-	struct cpuinfo_cache* l2 = NULL;
-	struct cpuinfo_cache* l3 = NULL;
 	const struct cpuinfo_processor** linux_cpu_to_processor_map = NULL;
 	const struct cpuinfo_core** linux_cpu_to_core_map = NULL;
 	uint32_t* linux_cpu_to_uarch_index_map = NULL;
@@ -742,26 +764,5 @@ void cpuinfo_arm_linux_init(void) {
 	cpuinfo_is_initialized = true;
 
 cleanup:
-
-#define CB(ptr) 	\
-	if (ptr) {		\
-		free(ptr);	\
-		ptr = NULL;	\
-	}
-
-	CB(arm_linux_processors);
-	CB(processors);
-	CB(cores);
-	CB(clusters);
-	CB(uarchs);
-	CB(l1i);
-	CB(l1d);
-	CB(l2);
-	CB(l3);
-	CB(linux_cpu_to_processor_map);
-	CB(linux_cpu_to_core_map);
-	CB(linux_cpu_to_uarch_index_map);
-
-#undef CB
-
+	atexit(atexit_free);
 }
