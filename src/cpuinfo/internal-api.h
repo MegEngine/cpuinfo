@@ -9,6 +9,7 @@
 
 #include <cpuinfo.h>
 #include <cpuinfo/common.h>
+#include <cpuinfo/fixsdk.h>
 
 
 enum cpuinfo_cache_level {

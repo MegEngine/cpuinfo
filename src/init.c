@@ -7,6 +7,7 @@
 #include <cpuinfo.h>
 #include <cpuinfo/internal-api.h>
 #include <cpuinfo/log.h>
+#include <cpuinfo/fixsdk.h>
 
 #ifdef __APPLE__
 	#include "TargetConditionals.h"

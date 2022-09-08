@@ -5,6 +5,7 @@
 
 #include <cpuinfo.h>
 #include <cpuinfo/common.h>
+#include <cpuinfo/fixsdk.h>
 
 enum cpuinfo_arm_chipset_vendor {
 	cpuinfo_arm_chipset_vendor_unknown = 0,

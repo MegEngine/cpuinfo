@@ -15,12 +15,15 @@
 #include <arm/linux/api.h>
 #include <cpuinfo/log.h>
 
-#if CPUINFO_ARCH_ARM64 || CPUINFO_ARCH_ARM && !defined(__ANDROID__) && !defined(__UCLIBC__)
+#if (CPUINFO_ARCH_ARM64 || CPUINFO_ARCH_ARM && !defined(__ANDROID__)) && !defined(__UCLIBC__)
 
 	#include <sys/auxv.h>
-#else
-	#define AT_HWCAP 16
-	#define AT_HWCAP2 26
+#endif
+#ifndef AT_HWCAP
+#define AT_HWCAP 16
+#endif
+#ifndef AT_HWCAP2
+#define AT_HWCAP2 26
 #endif
 
 
